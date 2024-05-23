@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyyield"
-version = "0.1"
+version = "0.1.0"
 license = { file = "LICENSE" }
 description = "Simple C++ ::std::this_thread::yield() call for Python, when sleep() calls have unknown effects."
 authors = [{name = "Rasmus Larsson"}]
@@ -26,4 +26,4 @@ documentation = "https://github.com/Tirine/pyyield"
 source = "https://github.com/Tirine/pyyield"
 download = "https://github.com/Tirine/pyyield"
 tracker = "https://github.com/Tirine/pyyield/issues"
-"release notes" = "https://github.com/Tirine/pyyield"
+"release notes" = "https://github.com/Tirine/pyyield/releases"
