@@ -29,24 +29,25 @@ static struct PyModuleDef pyyieldmodule
 PyMODINIT_FUNC PyInit_pyyield(void) { return PyModule_Create(&pyyieldmodule); }
 
 int main(int argc, char* argv[]) {
-	wchar_t* program = Py_DecodeLocale(argv[0], nullptr);
-	if (program == nullptr) {
+	PyStatus status;
+	PyConfig config;
+
+	PyConfig_InitIsolatedConfig(&config);
+	status = PyConfig_SetBytesArgv(&config, argc, argv);
+
+	if (PyStatus_Exception(status)) {
 		fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
-		exit(1);
+		PyConfig_Clear(&config);
+		Py_ExitStatusException(status);
 	}
 
-	/* Add a built-in module, before Py_Initialize */
-	if (PyImport_AppendInittab("pyyield", PyInit_pyyield) == -1) {
+	status = Py_InitializeFromConfig(&config);
+	if (PyStatus_Exception(status)) {
 		fprintf(stderr, "Error: could not extend in-built modules table\n");
-		exit(1);
+		PyConfig_Clear(&config);
+		Py_ExitStatusException(status);
 	}
-
-	/* Pass argv[0] to the Python interpreter */
-	Py_SetProgramName(program);
-
-	/* Initialize the Python interpreter.  Required.
-	   If this step fails, it will be a fatal error. */
-	Py_Initialize();
+	PyConfig_Clear(&config);
 
 	/* Optionally import the module; alternatively,
 	   import can be deferred until the embedded script
@@ -55,8 +56,9 @@ int main(int argc, char* argv[]) {
 	if (!pmodule) {
 		PyErr_Print();
 		fprintf(stderr, "Error: could not import module 'pyyield'\n");
+		PyConfig_Clear(&config);
+		Py_ExitStatusException(status);
 	}
 
-	PyMem_RawFree(program);
 	return 0;
 }
